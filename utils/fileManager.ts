@@ -102,3 +102,34 @@ export const getImagesForFolder = async (
     return [];
   }
 };
+
+interface ScanResult {
+  id: string; // The filename of the image
+  studentName: string;
+  score: number;
+  total: number;
+  status: "success" | "review";
+}
+
+export const getResults = async (folderId: string): Promise<ScanResult[]> => {
+  try {
+    const path = BASE_DIR + folderId + "/results.json";
+    const exists = await FileSystem.getInfoAsync(path);
+    if (!exists.exists) return [];
+
+    const content = await FileSystem.readAsStringAsync(path);
+    return JSON.parse(content);
+  } catch (e) {
+    console.error("Failed to read results", e);
+    return [];
+  }
+};
+
+export const saveResults = async (folderId: string, results: ScanResult[]) => {
+  try {
+    const path = BASE_DIR + folderId + "/results.json";
+    await FileSystem.writeAsStringAsync(path, JSON.stringify(results));
+  } catch (e) {
+    console.error("Failed to save results", e);
+  }
+};
